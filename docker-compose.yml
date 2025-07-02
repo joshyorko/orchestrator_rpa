@@ -1,0 +1,60 @@
+services:
+  # Django application
+  web:
+    build: .
+    volumes:
+      - ./orchestrator:/app
+      - ./robot_workspaces:/robot_workspaces
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rabbitmq
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - ROBOT_WORKSPACE_PATH=/robot_workspaces
+    command: >
+      sh -c "cd /app &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    networks:
+      - orchestrator_network
+
+  # RabbitMQ message broker for Celery
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"  # AMQP protocol
+      - "15672:15672"  # Management UI
+    networks:
+      - orchestrator_network
+
+  # Celery worker
+  celery_worker:
+    build: .
+    volumes:
+      - ./orchestrator:/app
+      - ./robot_workspaces:/robot_workspaces
+    depends_on:
+      - web
+      - rabbitmq
+    environment:
+      - ROBOT_WORKSPACE_PATH=/robot_workspaces
+    command: sh -c "cd /app && celery -A orchestrator worker -l info"
+    networks:
+      - orchestrator_network
+
+  # Celery beat for scheduled tasks
+  celery_beat:
+    build: .
+    volumes:
+      - ./orchestrator:/app
+    depends_on:
+      - web
+      - rabbitmq
+    command: sh -c "cd /app && celery -A orchestrator beat -l info"
+    networks:
+      - orchestrator_network
+
+networks:
+  orchestrator_network:
+    driver: bridge

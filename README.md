@@ -1,14 +1,14 @@
 # Orchestrator RPA
 
-The Orchestrator RPA Project is a platform that enables users to upload and manage massive tasks to be processed by automation robots (RPA). This tool addresses the problem of the need to perform repetitive and multiple tasks in systems that do not support the massive input of requests. Likewise, it integrates an orchestrator that intelligently assigns tasks to the robot with the fewest items under its responsibility.
+The Orchestrator RPA Project is a platform that enables users to upload and manage massive tasks to be processed by automation robots (RPA). This tool addresses the problem of repetitive and multiple tasks in systems that do not support bulk input. It also integrates an orchestrator that intelligently assigns tasks to the robot with the fewest items under its responsibility.
 
 ## Problem Description
 
-Many companies face the challenge of performing repetitive tasks manually due to limitations in the systems they use. This project aims to solve this problem by allowing users to upload massive tasks in a CSV format, which are then efficiently processed by automation robots.
+Many companies face the challenge of performing repetitive tasks manually due to limitations in their systems. This project aims to solve this problem by allowing users to upload massive tasks in CSV format, which are then efficiently processed by automation robots.
 
 ## Key Features
 
-* User-friendly and responsive graphical interface for users.
+* User-friendly and responsive graphical interface.
 * User authentication for task uploading and management.
 * Ability to upload tasks with multiple items (e.g., phone numbers, account numbers).
 * API for robots to connect and make requests.
@@ -18,6 +18,16 @@ Many companies face the challenge of performing repetitive tasks manually due to
 * Pulse system for monitoring robot activity.
 * Utilization of Celery for automatic task assignment and finding available robots.
 * Integration with Django REST Framework for the API.
+* **NEW**: Integration with Robocorp RCC for executing robot tasks directly from the orchestrator.
+
+## Robocorp Integration
+
+This project now includes integration with [Robocorp RCC](https://robocorp.com/docs/rcc/overview) to run robots directly. See [ROBOCORP_INTEGRATION.md](ROBOCORP_INTEGRATION.md) for more details on:
+
+- How the integration works
+- Directory structure for robot workspaces
+- RCC commands used
+- Robot initialization and execution flow
 
 ## Configuration and Requirements
 
@@ -43,7 +53,7 @@ pip install -r requirements.txt
 
 ```bash
 sudo apt-get update
-sudo apt-get install celery 
+sudo apt-get install celery
 sudo apt-get install rabbitmq-server
 ```
 
@@ -62,9 +72,9 @@ python3 manage.py createsuperuser
 
 ### 4. Create robots and processes
 
-Before creating robots, a user must be created for each robot; subsequently, the robot is created by passing the created user as an argument to its `robot_id` attribute.
+Before creating robots, a user must be created for each robot; then the robot is created by passing the created user as an argument to its `robot_id` attribute.
 
-You can make any modifications such as creating users, robots, and processes by logging in to:
+You can make modifications such as creating users, robots, and processes by logging in to:
 https://localhost:8000/admin
 
 You can also do it using the Django Shell:
@@ -74,13 +84,13 @@ python3 manage.py shell
 ```
 
 ```python
-    >>> from django.contrib.auth.models import User
-    >>> from robots.models import Robot
-    >>> from processes.models import Process
-    >>> user1 = User.objects.create(username='robot1', password='123')
-    >>> robot1 = Robot.objects.create(user_id=user1, ip_address='0.0.0.1')
-    <Robot: 0.0.0.1>
-    >>> process1 = Process.objects.create(title='Proccess1')
+from django.contrib.auth.models import User
+from robots.models import Robot
+from processes.models import Process
+user1 = User.objects.create(username='robot1', password='123')
+robot1 = Robot.objects.create(user_id=user1, ip_address='0.0.0.1')
+<Robot: 0.0.0.1>
+process1 = Process.objects.create(title='Process1')
 ```
 
 Remember that a process is something to be carried out by the robot, for example (Balance reload, Account registration, etc).
@@ -92,7 +102,7 @@ Check if it's already running:
 ```bash
 sudo rabbitmqctl status
 ```
-If it's not running, then start the server.
+If it's not running, then start the server:
 ```bash
 sudo rabbitmq-server
 ```
@@ -107,14 +117,14 @@ Before running the server, you must uncomment the lines in the `robots/tasks.py`
 python3 manage.py runserver
 ```
 
-### 8. Initiate Celery Beat
+### 8. Start Celery Beat
 
 Navigate to the root path of the project and execute:
 ```bash
 celery -A orchestrator beat -l info
 ```
 
-### 9. Initiate the Celery Worker
+### 9. Start the Celery Worker
 
 Navigate to the root path of the project and execute:
 ```bash
@@ -126,7 +136,7 @@ celery -A orchestrator worker -l info
 Log in using your credentials; afterward, you will be able to view the user dashboard.
 ![Login](images/login.jpg)
 ### ✅Simple Dashboard
-You can also visualize the number of connected robots, tasks, and loaded items.
+You can also view the number of connected robots, tasks, and loaded items.
 ![dashboard](images/dashboard.jpg)
 ### ✅Creating tasks
 Add tasks by clicking on (+ New task), upload the `.csv` file, and it will automatically start assigning tasks as soon as a connected robot is found.
@@ -137,13 +147,13 @@ Add tasks by clicking on (+ New task), upload the `.csv` file, and it will autom
 
 To upload tasks to the Orchestrator RPA Project, you must use a CSV file with the following format:
 ```
-    linea,valor,field_name
+    line,value,field_name
     1,a,hello
     2,b,hello
     3,c,hello
 ```
-- `linea`: Line number or count (integer).
-- `valor`: Task value (text).
+- `line`: Line number or count (integer).
+- `value`: Task value (text).
 - `field_name`: Name of the field associated with the task, you can use it for another important field (text).
 
 Make sure that the fields are separated by commas and that each line represents an individual task. This format allows you to upload tasks with multiple items, such as phone numbers or account numbers, along with the task description and associated field.
@@ -187,7 +197,7 @@ Params: {"robot_id": 1}
 ```
 PATCH /api/tasks/
 Authorization: Token XXXX-XXXX-XXXX-XXXX
-Params: {"item_id": 1, "status": "COMPLETED", "observation": "Sin observaciones"}
+Params: {"item_id": 1, "status": "COMPLETED", "observation": "No observations"}
 ```
 
 ### Modify Items
@@ -199,11 +209,11 @@ Params: {"robot_id": 1, "task_id": 1, "status": "COMPLETED"}
 ```
 
 
-Remember that the parameters may vary as you make the requests, the API documentation is located at:  http://localhost:8000/docs
+Remember that the parameters may vary as you make the requests. The API documentation is located at:  http://localhost:8000/docs
 
 ## Credits
 
-Developed by [@daferferso](https://github.com/daferferso). IInspired by the necessity to automate repetitive tasks in corporate environments with proper robot management.
+Developed by [@daferferso](https://github.com/daferferso). Inspired by the need to automate repetitive tasks in corporate environments with proper robot management.
 Thanks to [@themesberg](https://github.com/themesberg) and [@app-generator](https://github.com/app-generator) for the VOLT template.
 
 ## License

@@ -10,8 +10,8 @@
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-2">
     <div class="d-block mb-2 mb-md-0">
-        <h2 class="h4">Items de tarea ID: {{ task.id }}</h2>
-        <p class="mb-0">Proceso: {{ task.process_id }}</p>
+        <h2 class="h4">Task items ID: {{ task.id }}</h2>
+        <p class="mb-0">Process: {{ task.process_id }}</p>
     </div>
 </div>
 
@@ -21,12 +21,12 @@
             <tr>
                 <th class="border-gray-200">Id</th>
                 <th class="border-gray-200">Robot</th>
-                <th class="border-gray-200">Fecha de creación</th>
-                <th class="border-gray-200">Fecha de inicio</th>
-                <th class="border-gray-200">Fecha de fin</th>
-                <th class="border-gray-200">Estado</th>
+                <th class="border-gray-200">Created at</th>
+                <th class="border-gray-200">Start date</th>
+                <th class="border-gray-200">End date</th>
+                <th class="border-gray-200">Status</th>
                 <th class="border-gray-200">Obs.</th>
-                <th class="border-gray-200">Acción</th>
+                <th class="border-gray-200">Action</th>
             </tr>
         </thead>
         <tbody>
@@ -36,7 +36,7 @@
                 <td> <span class="fw-extrabold">{{ item.id }}</span></td>
                 <td><span class="fw-normal">
                     {% if not item.robot_id %}
-                    No asignado
+                    Unassigned
                     {% else %}
                     {{ item.robot_id.user_id.username }}
                     {% endif %}

@@ -189,3 +189,13 @@ CELERY_CACHE_BACKEND = 'django-cache'
 # Indica a Celery Beat que utilice el planificador de bases de datos
 # para programar y ejecutar las tareas
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# ROBOCORP RCC CONFIGURATION
+# Path to store robot workspaces
+ROBOT_WORKSPACE_PATH = os.environ.get('ROBOT_WORKSPACE_PATH', os.path.join(os.path.dirname(BASE_DIR), 'robot_workspaces'))
+
+# Ensure the directory exists
+os.makedirs(ROBOT_WORKSPACE_PATH, exist_ok=True)
+
+# API URL for robots to call back
+API_URL = os.environ.get('API_URL', 'http://localhost:8000/api')

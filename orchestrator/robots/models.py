@@ -15,6 +15,12 @@ class Robot(models.Model):
     status = models.CharField(null=False, blank=False, max_length=50,
                               choices=StatusRobot.choices,
                               default=StatusRobot.INACTIVE)
+    robot_yaml_path = models.CharField(max_length=255, null=True, blank=True,
+                                       help_text="Path to the robot.yaml file")
+    initialized = models.BooleanField(default=False, 
+                                      help_text="Whether the robot workspace has been initialized")
+    available_tasks = models.JSONField(null=True, blank=True,
+                                       help_text="Available tasks in this robot")
 
     def __str__(self) -> str:
         return self.ip_address

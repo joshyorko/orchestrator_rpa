@@ -19,7 +19,7 @@ from items.models import Item
 from processes.models import Process
 from api.utils import token_login, check_id, check_if_can_change_status
 from utils.choices import Status
-# from robots.tasks import periodic_task_check
+from robots.tasks import periodic_task_check
 
 # Create your views here.
 
